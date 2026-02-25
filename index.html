@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashMan — Items For Sale</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #161616;
+    --card: #1c1c1c;
+    --border: #2a2a2a;
+    --accent: #e8c547;
+    --accent2: #e85c47;
+    --text: #f0ede6;
+    --muted: #888;
+    --tag-bg: #252525;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    background: rgba(13,13,13,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .logo-area {
+    padding: 1rem 0;
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+  }
+
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .logo-sub {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .item-count {
+    background: var(--accent);
+    color: #000;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1rem;
+    padding: 0.2rem 0.6rem;
+    letter-spacing: 0.1em;
+    border-radius: 2px;
+  }
+
+  /* ===== CONTROLS ===== */
+  .controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0.75rem 0;
+    flex: 1;
+    max-width: 700px;
+  }
+
+  .search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  input[type="search"] {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    padding: 0.6rem 0.75rem 0.6rem 2rem;
+    outline: none;
+    border-radius: 3px;
+    transition: border-color 0.2s;
+  }
+
+  input[type="search"]:focus {
+    border-color: var(--accent);
+  }
+
+  select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    padding: 0.6rem 0.75rem;
+    outline: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  /* ===== HERO TICKER ===== */
+  .ticker-wrap {
+    background: var(--accent);
+    color: #000;
+    overflow: hidden;
+    padding: 0.45rem 0;
+    white-space: nowrap;
+  }
+
+  .ticker {
+    display: inline-block;
+    animation: ticker 60s linear infinite;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ===== STATS BAR ===== */
+  .stats-bar {
+    display: flex;
+    gap: 2rem;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* ===== CATEGORY TABS ===== */
+  .cat-scroll {
+    overflow-x: auto;
+    border-bottom: 1px solid var(--border);
+    scrollbar-width: none;
+    padding: 0 2rem;
+  }
+
+  .cat-scroll::-webkit-scrollbar { display: none; }
+
+  .cats {
+    display: flex;
+    gap: 0;
+    min-width: max-content;
+  }
+
+  .cat-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .cat-btn:hover { color: var(--text); }
+  .cat-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ===== GRID ===== */
+  .grid-wrap {
+    padding: 2rem;
+  }
+
+  .results-info {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  .results-info span { color: var(--accent); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--border);
+  }
+
+  /* ===== ITEM CARD ===== */
+  .item-card {
+    background: var(--card);
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .item-card:hover {
+    background: #222;
+  }
+
+  .item-card:hover .item-num {
+    color: var(--accent);
+  }
+
+  .item-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.9rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    transition: color 0.15s;
+  }
+
+  .item-name {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .item-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    align-self: flex-start;
+    font-weight: 500;
+  }
+
+  .badge-sealed { background: #1a3a1a; color: #5fba5f; }
+  .badge-new { background: #1a2a3a; color: #5fa0e0; }
+  .badge-as-is { background: #3a1a1a; color: #e05f5f; }
+  .badge-used { background: #2a2a1a; color: #c8b86a; }
+  .badge-misc { background: #252525; color: var(--muted); }
+
+  .contact-btn {
+    margin-top: 0.5rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+    align-self: flex-start;
+  }
+
+  .contact-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  /* ===== NO RESULTS ===== */
+  .no-results {
+    grid-column: 1/-1;
+    padding: 4rem;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .no-results .big { 
+    font-family: 'Bebas Neue', sans-serif; 
+    font-size: 4rem; 
+    color: var(--border);
+    display: block;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    max-width: 480px;
+    width: 100%;
+    padding: 2rem;
+    position: relative;
+    animation: modalIn 0.2s ease;
+    border-radius: 4px;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 1rem; right: 1rem;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .modal-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    color: var(--text);
+  }
+
+  .modal-msg {
+    font-size: 0.75rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  .modal-action {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: opacity 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.85; }
+
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { border-color: var(--muted); color: var(--text); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  .footer-text {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 600px) {
+    header { padding: 0 1rem; }
+    .grid-wrap { padding: 1rem; }
+    .stats-bar { padding: 1rem; gap: 1.25rem; }
+    .grid { grid-template-columns: 1fr 1fr; }
+    .logo { font-size: 2rem; }
+  }
+
+  /* Staggered entrance */
+  .item-card {
+    animation: fadeUp 0.35s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    830 ITEMS · FLASHMAN &nbsp;·&nbsp; ELECTRONICS &nbsp;·&nbsp; GADGETS &nbsp;·&nbsp; HOME &nbsp;·&nbsp; CAMERAS &nbsp;·&nbsp; GAMING &nbsp;·&nbsp; AUDIO &nbsp;·&nbsp; HEALTH &nbsp;·&nbsp; OFFICE &nbsp;·&nbsp; MISC &nbsp;·&nbsp; MESSAGE TO INQUIRE &nbsp;·&nbsp; 830 ITEMS · FLASHMAN &nbsp;·&nbsp; ELECTRONICS &nbsp;·&nbsp; GADGETS &nbsp;·&nbsp; HOME &nbsp;·&nbsp; CAMERAS &nbsp;·&nbsp; GAMING &nbsp;·&nbsp; AUDIO &nbsp;·&nbsp; HEALTH &nbsp;·&nbsp; OFFICE &nbsp;·&nbsp; MISC &nbsp;·&nbsp; MESSAGE TO INQUIRE &nbsp;·&nbsp;
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div>
+      <div class="logo">FlashMan</div>
+      <div class="logo-sub">Fast Finds. Quick Deals.</div>
+    </div>
+    <span class="item-count" id="visibleCount">830</span>
+  </div>
+  <div class="controls">
+    <div class="search-wrap">
+      <input type="search" id="searchInput" placeholder="Search items..." autocomplete="off">
+    </div>
+    <select id="sortSelect">
+      <option value="num-asc">Item # ↑</option>
+      <option value="num-desc">Item # ↓</option>
+      <option value="alpha">A → Z</option>
+    </select>
+  </div>
+</header>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num">830</div><div class="stat-label">Total Items</div></div>
+  <div class="stat"><div class="stat-num" id="sealedCount">—</div><div class="stat-label">Sealed</div></div>
+  <div class="stat"><div class="stat-num" id="newCount">—</div><div class="stat-label">New</div></div>
+  <div class="stat"><div class="stat-num" id="asisCount">—</div><div class="stat-label">As-Is</div></div>
+  <div class="stat"><div class="stat-num" id="resultStat">830</div><div class="stat-label">Showing</div></div>
+</div>
+
+<!-- CATEGORY TABS -->
+<div class="cat-scroll">
+  <div class="cats" id="catTabs">
+    <button class="cat-btn active" data-cat="all">All</button>
+    <button class="cat-btn" data-cat="electronics">Electronics</button>
+    <button class="cat-btn" data-cat="cameras">Cameras & Photo</button>
+    <button class="cat-btn" data-cat="gaming">Gaming</button>
+    <button class="cat-btn" data-cat="audio">Audio</button>
+    <button class="cat-btn" data-cat="health">Health & Wellness</button>
+    <button class="cat-btn" data-cat="home">Home & Decor</button>
+    <button class="cat-btn" data-cat="office">Office & Stationery</button>
+    <button class="cat-btn" data-cat="lighting">Lights & LED</button>
+    <button class="cat-btn" data-cat="phone">Phone Accessories</button>
+    <button class="cat-btn" data-cat="cables">Cables & Adapters</button>
+    <button class="cat-btn" data-cat="misc">Misc & Bundles</button>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="grid-wrap">
+  <div class="results-info" id="resultsInfo">Showing <span id="countSpan">830</span> of 830 items</div>
+  <div class="grid" id="itemGrid"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">FlashMan</div>
+  <div class="footer-text">Drop a message to inquire about any item · All sales final · Items subject to availability</div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-num" id="modalNum">#001</div>
+    <div class="modal-name" id="modalName"></div>
+    <div class="modal-msg">
+      Interested in this item? Drop a message with the item number and name. Items are sold as-is unless otherwise noted. First come, first served!
+    </div>
+    <div class="modal-action">
+      <button class="btn-primary" onclick="copyItem()">Copy Item Info</button>
+      <button class="btn-secondary" onclick="closeModal()">Back to List</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const items = [
+  {num:1,name:"KODAK 35 Rangefinder (w/ Anastigmat Special Lens)",cat:"cameras"},
+  {num:2,name:"VIVO 26 inch Desk Converter, K Series",cat:"office"},
+  {num:3,name:"55\" Crystal 4K TV — Damaged, Stand Missing, As-Is",cat:"electronics",status:"as-is"},
+  {num:4,name:"Ninja Foodi 6-in-1 8-qt 2-Basket Air Fryer",cat:"home"},
+  {num:5,name:"HOVERFLY Magic Hoverboard with 6.5\" Luminous Wheels",cat:"home"},
+  {num:6,name:"Time Lapse Camera, 4K FHD Timelapse Camera",cat:"cameras"},
+  {num:7,name:"Night Vision Goggles - 4K Night Vision Binoculars",cat:"electronics"},
+  {num:8,name:"Portable Handheld Mini Fan with Digital Display",cat:"home"},
+  {num:9,name:"MINGKIDS Star Night Light Projector Toys",cat:"lighting"},
+  {num:10,name:"DrunkDeer G65 Rapid Trigger Mechanical Keyboard",cat:"electronics"},
+  {num:11,name:"4K HDMI Video Capture Card — Cam Link Game Capture",cat:"electronics"},
+  {num:12,name:"Sabrent 4 Port USB 2.0 Portable Hub",cat:"cables"},
+  {num:13,name:"Partsam 2pcs 15\" Clear Lens Red LED Flange Mount",cat:"electronics"},
+  {num:14,name:"Front Left Driver Side Power Window Master Control",cat:"electronics"},
+  {num:15,name:"Tera Pro Wireless 1D 2D QR Barcode Scanner",cat:"electronics"},
+  {num:16,name:"Car Interior Ambient Lights 18-in-1 128 Color LED",cat:"lighting"},
+  {num:17,name:"Battery Motion Activated Soft White Night Light",cat:"lighting"},
+  {num:18,name:"Third Eye Headlamps - Camping Headlamp",cat:"electronics"},
+  {num:19,name:"NexiGo PS5 Accessories Essential Kit Wall Mount",cat:"gaming"},
+  {num:20,name:"BIGTREETECH SKR Mini E3 V3.0 3D Printer Control Board",cat:"electronics"},
+  {num:21,name:"JmGO Projector Flexible Tripod Stand Aluminum",cat:"electronics"},
+  {num:22,name:"BPA Free 1000ml/32oz Motivational Water Bottle",cat:"home"},
+  {num:23,name:"Urth 49mm ND64 (6 Stop) Lens Filter (Plus+)",cat:"cameras"},
+  {num:24,name:"onn. Wireless Keyboard and Mouse Combo",cat:"electronics"},
+  {num:25,name:"Mainstay Metro Boot Tray Grey",cat:"home"},
+  {num:26,name:"Wireless Stylus Pen for Tablets and Phones",cat:"phone"},
+  {num:27,name:"SEVEN WARRIOR Gaming Desk",cat:"gaming"},
+  {num:28,name:"12\" Captain America Action Figure",cat:"home"},
+  {num:29,name:"Doulton by Royal Doulton 30ml Spray",cat:"home"},
+  {num:30,name:"Sleek Rectangular Black Dial Watch",cat:"electronics"},
+  {num:31,name:"Light Therapy Lamp",cat:"health"},
+  {num:32,name:"Mini Fairy Lights 7.5 ft Total Length",cat:"lighting"},
+  {num:33,name:"Plug-in Light Control Unit with Two Round Attachments",cat:"lighting"},
+  {num:34,name:"Stress Relief Focus Rings",cat:"health"},
+  {num:35,name:"Stress Relief Focus Rings",cat:"health"},
+  {num:36,name:"Telescope 130EQ Reflector with Accessories — Used",cat:"electronics",status:"used"},
+  {num:37,name:"96 Roll Toilet Paper",cat:"home"},
+  {num:38,name:"42 Pack Flushable Body Wipes",cat:"health"},
+  {num:39,name:"24 Pack Paper Towel",cat:"home"},
+  {num:40,name:"Polaroid Instant Camera AZ13555",cat:"cameras"},
+  {num:41,name:"BOBOVR A2 VR Headphones Quest 2 — NEW",cat:"gaming",status:"new"},
+  {num:42,name:"Outdoor Folding Chairs — NEW",cat:"home",status:"new"},
+  {num:43,name:"Govee 4.9ft RGBIC Smart Curtain Lights — BN",cat:"lighting"},
+  {num:44,name:"Retro 4PASS Porta Camera",cat:"cameras"},
+  {num:45,name:"KODAK Instant Dock Printer",cat:"cameras"},
+  {num:46,name:"Digital Advertising Display / Photo Slider",cat:"electronics"},
+  {num:47,name:"5x Lego Figure Keychains",cat:"home"},
+  {num:48,name:"SLR Film Camera — Olympus OM-10 35mm",cat:"cameras"},
+  {num:49,name:"Polo Assassin Kids Watch",cat:"home"},
+  {num:50,name:"2-Outlet Mechanical 24 Hour Timer — Stanley",cat:"home"},
+  {num:51,name:"Men's Size 34 Belt — Leather — Perry Ellis",cat:"home"},
+  {num:52,name:"Hair Toner — Lowell Violet Platinum 240g",cat:"health"},
+  {num:53,name:"60% Wired Gaming Keyboard — RGB Compact 61 Keys",cat:"gaming"},
+  {num:54,name:"Large Mouse Pad, 31.5x11.8 inch",cat:"electronics"},
+  {num:55,name:"Gold Wings Resin Statue Modern Home Decor",cat:"home"},
+  {num:56,name:"WARHAMMER 40K TERMINATOR — JOYTOY Figure",cat:"home"},
+  {num:57,name:"Microsoft Surface RT (32GB)",cat:"electronics",status:"used"},
+  {num:58,name:"iPad Mini Gen 2",cat:"electronics",status:"used"},
+  {num:59,name:"DJ Rack Floor Holder Stand",cat:"audio"},
+  {num:60,name:"Alexa USB LED Strip Lights 3m/9.84ft TV LED",cat:"lighting"},
+  {num:61,name:"Alexa USB LED Strip Lights 3m/9.84ft TV LED",cat:"lighting"},
+  {num:62,name:"Staples Standard Green Hanging File Folders 25-Pack",cat:"office"},
+  {num:63,name:"LUX Paper 6x9 Booklet Envelopes 24lbs",cat:"office"},
+  {num:64,name:"Shoe Cleaner — Sneaker Cleaner Removes Dirt",cat:"health"},
+  {num:65,name:"Journal A5 PU Leather Notebook — Green",cat:"office"},
+  {num:66,name:"4 Pack Car Cup Holder Coaster 2.75 Inch",cat:"home"},
+  {num:67,name:"JAM Paper Plastic 1 Inch Mini Binder",cat:"office"},
+  {num:68,name:"Y YOMA 9 Pack Decorative Hanging File Folders",cat:"office"},
+  {num:69,name:"Y YOMA 9 Pack Decorative Hanging File Folders",cat:"office"},
+  {num:70,name:"JAM Paper 9¾\" × 14¼\" 6pk Plastic Envelopes",cat:"office"},
+  {num:71,name:"Notebook A5 PU Leather Hardcover Journal 365 Pages",cat:"office"},
+  {num:72,name:"Staples Recycled Paper Filing Folders Legal",cat:"office"},
+  {num:73,name:"Ksriylm Square Aesthetic Landscape Mouse Pad",cat:"electronics"},
+  {num:74,name:"Merangue Rubber Bands Size #10 1/4 Lb Box",cat:"office"},
+  {num:75,name:"PowerA DualShock Charging Station for PlayStation",cat:"gaming"},
+  {num:76,name:"12x12 Large 3 Ring DIY Scrapbook Photo Album",cat:"office"},
+  {num:77,name:"Universal Phone Holder Stand Stretchable Silicone",cat:"phone"},
+  {num:78,name:"Ice Scraper 2 Pack",cat:"home"},
+  {num:79,name:"Foam Insulation Tape",cat:"home"},
+  {num:80,name:"Kitsure Monitor Stand",cat:"office"},
+  {num:81,name:"SCON DALI Dimmable Corner Joint",cat:"lighting"},
+  {num:82,name:"2pcs Bed Frame Support Legs",cat:"home"},
+  {num:83,name:"ivoler Clear Case Nintendo Switch",cat:"gaming"},
+  {num:84,name:"avedio HDMI Splitter",cat:"cables"},
+  {num:85,name:"12pcs Replacement Bolt Set",cat:"home"},
+  {num:86,name:"JAM Paper Vellum Bristol",cat:"office"},
+  {num:87,name:"Thick Journaling Notebook — Grey",cat:"office"},
+  {num:88,name:"Thick Journal Notebook — Blue",cat:"office"},
+  {num:89,name:"SagaSave B5 PU Leather Notebook",cat:"office"},
+  {num:90,name:"A6 Invitation Envelopes Candy Pink",cat:"office"},
+  {num:91,name:"Domtar FSC Lynx Digital Paper",cat:"office"},
+  {num:92,name:"Staples File Folders Legal Size",cat:"office"},
+  {num:93,name:"JiaWei Expanding File Folders",cat:"office"},
+  {num:94,name:"Thick Journal Notebook — Dark Blue",cat:"office"},
+  {num:95,name:"Zebra Pen Telescopic Stylus Pen",cat:"office"},
+  {num:96,name:"PATIKIL Prism Tape",cat:"office"},
+  {num:97,name:"Colaxi DIY Latch Hook Rug Kit",cat:"home"},
+  {num:98,name:"60 Sheets Printable Vinyl Sticker Paper",cat:"office"},
+  {num:99,name:"60 Sheets Printable Vinyl Sticker Paper",cat:"office"},
+  {num:100,name:"YAKESD 10 Pack Badge Reel",cat:"office"},
+  {num:101,name:"PATIKIL Paint Canvases 4 Pack",cat:"home"},
+  {num:102,name:"Valentines Day Gift Notebook",cat:"office"},
+  {num:103,name:"Fengtaiyuan Red Gel Pens",cat:"office"},
+  {num:104,name:"138 Colors Watercolor Paint Set",cat:"home"},
+  {num:105,name:"Phone Camera Lens Kit 4-in-1 22X Telephoto",cat:"cameras"},
+  {num:106,name:"8x10ft Outdoor Patio Rug Waterproof — SEALED",cat:"home",status:"sealed"},
+  {num:107,name:"NEW Comics JUSTICE LEAGUE 4-Pack",cat:"home",status:"new"},
+  {num:108,name:"6'x9' Outdoor Patio Rug Waterproof — NEW",cat:"home",status:"new"},
+  {num:109,name:"32\" Privacy Screen Filter Widescreen Monitor",cat:"office"},
+  {num:110,name:"2pcs 8lb Round Weights — NEW",cat:"health",status:"new"},
+  {num:111,name:"BOHOPOPM Full Comforter Set — NEW",cat:"home",status:"new"},
+  {num:112,name:"22\" Standing Desk",cat:"office"},
+  {num:113,name:"2-in-1 Wireless CarPlay Adapter & Android Auto — SEALED",cat:"electronics",status:"sealed"},
+  {num:114,name:"Friendly Lightweight Durable Burn-Proof Bundle",cat:"misc"},
+  {num:115,name:"NEW Mini DisplayPort to HDMI Adapter",cat:"cables",status:"new"},
+  {num:116,name:"NEW Canada to India Plug Adapter",cat:"cables",status:"new"},
+  {num:117,name:"NEW Wireless Tattoo Pen Machine",cat:"health",status:"new"},
+  {num:118,name:"NEW 70\" LED Car Hood Strip Light",cat:"lighting",status:"new"},
+  {num:119,name:"NEW Stainless Steel Watch Strap w/ Apple Watch Band 49mm",cat:"phone",status:"new"},
+  {num:120,name:"NEW 2PK Dual-core 32-bit Microcontroller",cat:"electronics",status:"new"},
+  {num:121,name:"2-in-1 Wireless CarPlay Adapter — SEALED",cat:"electronics",status:"sealed"},
+  {num:122,name:"NEW 2025 Smart Music Boxing Gloves Bluetooth",cat:"health",status:"new"},
+  {num:123,name:"Adjustable Desk/Monitor Riser, Black",cat:"office"},
+  {num:124,name:"Large Cork Yoga Mat",cat:"health"},
+  {num:125,name:"NEW FISYOD Foldable Laptop Table Tray",cat:"office",status:"new"},
+  {num:126,name:"NEW Wedge Pillow (7.5\" H)",cat:"health",status:"new"},
+  {num:127,name:"Ab Roller Wheel 4-Wheel Design Ultra-Stable Core Trainer",cat:"health"},
+  {num:128,name:"110L Laundry Basket Hamper Collapsible — SEALED",cat:"home",status:"sealed"},
+  {num:129,name:"Magnetic Wireless Charging Stand (2024) — NEW",cat:"phone",status:"new"},
+  {num:130,name:"Beyution CT-90428 Remote Control",cat:"electronics"},
+  {num:131,name:"Olympus LI-41C Quick Charger",cat:"cameras"},
+  {num:132,name:"Spiral LED Pendant Light for Living Room",cat:"lighting"},
+  {num:133,name:"ROCKBROS Password Storage Box",cat:"home"},
+  {num:134,name:"2 Set KIPYE Tabletop Stand 50x25mm — SEALED",cat:"home",status:"sealed"},
+  {num:135,name:"Charging Dock Meta Quest 3S",cat:"gaming"},
+  {num:136,name:"Cordless Heated Eye Mask",cat:"health"},
+  {num:137,name:"Eyesen Film Viewer LED Light Panel",cat:"cameras"},
+  {num:138,name:"LIGHTEN LIFE 1965 Whiskey Glass",cat:"home"},
+  {num:139,name:"NIIMBOT D110 Mini Label Maker",cat:"office"},
+  {num:140,name:"SAMSUNG 32\" ODYSSEY G3 FHD 180HZ 1MS MONITOR",cat:"electronics"},
+  {num:141,name:"BONTEC KEYBOARD DRAWER 25.6-30 x 11.8",cat:"office"},
+  {num:142,name:"2 Pack LED Strip Lights 32.8ft 300 LEDs",cat:"lighting"},
+  {num:143,name:"2 Pack BERGLANDER Plastic Plates 12-Pack 9\"",cat:"home"},
+  {num:144,name:"2 Pack 15.6\" Privacy Screen 16:10 Filter",cat:"office"},
+  {num:145,name:"HORI PS4 Mini Wired Gamepad — Red",cat:"gaming"},
+  {num:146,name:"2ft Fall Lighted Eucalyptus Tree 2 Pack",cat:"home"},
+  {num:147,name:"Pack of 2 Wooden Projector Shelf TV Stand",cat:"home"},
+  {num:148,name:"NBCP Wireless Guitar Controller for PC & PS3",cat:"gaming"},
+  {num:149,name:"RIANCY Micro-Line Pens 12-Set Black Ink",cat:"office"},
+  {num:150,name:"KANTEK LCD Monitor Magnifier Filter MAG19L",cat:"office"},
+  {num:151,name:"GHOST OF YOTEI — Collector's Edition PS5",cat:"gaming"},
+  {num:152,name:"COORS LIGHT 12-Can Portable Mini Fridge",cat:"home"},
+  {num:153,name:"HELLO KITTY Sunrise Alarm Clock",cat:"home"},
+  {num:154,name:"Magnetic Tape 1/2\" Wide Adhesive Pack of 3",cat:"home"},
+  {num:155,name:"NEW 20-MP VIVITAR 8X Zoom Digital Camera",cat:"cameras",status:"new"},
+  {num:156,name:"BELKIN Convertible Magnetic Charging Stand — SEALED",cat:"phone",status:"sealed"},
+  {num:157,name:"VIVITAR Aqua Snap 18-MP Underwater Camera",cat:"cameras"},
+  {num:158,name:"Non-Slip Tropical Beach Mouse Pad",cat:"electronics"},
+  {num:159,name:"Rechargeable Cigarette Lighter with Charging",cat:"home"},
+  {num:160,name:"CLAIRBELL Cigarette Lighter Case",cat:"home"},
+  {num:161,name:"DisplayPort to HDMI Adapter",cat:"cables"},
+  {num:162,name:"6-ft Universal File Transfer Cable",cat:"cables"},
+  {num:163,name:"USB to HDMI Adapter",cat:"cables"},
+  {num:164,name:"4-Port Powered USB Hub with 5-ft Cable",cat:"cables"},
+  {num:165,name:"Bar Beer Automatic Bottle Opener",cat:"home"},
+  {num:166,name:"Universal Travel Adapter & Converter",cat:"home"},
+  {num:167,name:"JO MILANO Game of Spades Wildcard 100ml Perfume",cat:"health"},
+  {num:168,name:"Rechargeable Cigarette Lighter w/ Charging Cable",cat:"home"},
+  {num:169,name:"SAMSUNG 15W Super Fast Wireless Charger",cat:"phone"},
+  {num:170,name:"NEW APPLE AIRPODS (Gen 4) w/ Wireless Charging Case",cat:"audio",status:"new"},
+  {num:171,name:"16/15/14 Pro Max Glass Screen Protector",cat:"phone"},
+  {num:172,name:"BELKIN 3.5mm Audio + Charge Rockstar for iPhone",cat:"phone"},
+  {num:173,name:"180W Universal Laptop Charger w/ 10-ft Cable",cat:"electronics"},
+  {num:174,name:"BELKIN 6-in-1 USB-C 60W Multimedia Hub",cat:"cables"},
+  {num:175,name:"Bar Beer Automatic Bottle Opener",cat:"home"},
+  {num:176,name:"Laptop Hinge Kit",cat:"electronics"},
+  {num:177,name:"DYSON Mini Soft Dusting Brush",cat:"home"},
+  {num:178,name:"Screwdriver Combination Tool Set",cat:"home"},
+  {num:179,name:"180° Multifunctional Rechargeable Flashlight",cat:"home"},
+  {num:180,name:"Multi-Purpose Precision Screwdriver",cat:"home"},
+  {num:181,name:"LBT 3.5mm Jack Headphone Adapter",cat:"audio"},
+  {num:182,name:"Blue Ocean 100ml EDT Perfume / Cologne",cat:"health"},
+  {num:183,name:"Le Grande White 100ml EDT Perfume / Cologne",cat:"health"},
+  {num:184,name:"Rechargeable 130,000 RPM Cleaner/Blower Fan",cat:"home"},
+  {num:185,name:"You & Me 100ml EDT Perfume / Cologne",cat:"health"},
+  {num:186,name:"BELKIN 20000mAh Power Bank (Boost Charge Pro)",cat:"phone"},
+  {num:187,name:"LBT 3-in-1 Foldable Wireless Charging Stand",cat:"phone"},
+  {num:188,name:"ENERGIZER Magnetic Wireless Car Charger Ultimate",cat:"phone"},
+  {num:189,name:"Rechargeable Super Bright Zoomable Flashlight",cat:"home"},
+  {num:190,name:"Apple MacBook Bottom Case Replacement",cat:"electronics"},
+  {num:191,name:"90W Universal Laptop Charger w/ 10-ft Cable",cat:"electronics"},
+  {num:192,name:"Universal Travel Adapter & Converter",cat:"home"},
+  {num:193,name:"Modern Bedside Table Lamp",cat:"lighting"},
+  {num:194,name:"Stainless Steel Vegetable Peeler",cat:"home"},
+  {num:195,name:"16-Piece Closet Hanger Connector Hooks",cat:"home"},
+  {num:196,name:"60W Multi-Function Data Cable Set",cat:"cables"},
+  {num:197,name:"Compact Design Travel Adapter",cat:"home"},
+  {num:198,name:"Hula Hoop / Wave Hoop Exercise",cat:"health"},
+  {num:199,name:"Converter 1x T",cat:"cables"},
+  {num:200,name:"ROCKETFISH 4-ft HDMI Cable 4K Ultra HD",cat:"cables"},
+  {num:201,name:"TIMEX FM Dual Alarm Clock Radio w/ USB Charging",cat:"electronics"},
+  {num:202,name:"NEW Rechargeable 130,000 RPM Cleaner/Blower Fan",cat:"home",status:"new"},
+  {num:203,name:"Stainless 13-Gal Automatic Trash Can",cat:"home"},
+  {num:204,name:"PROSCAN HDMI Upconvert DVD Player w/ Remote",cat:"electronics"},
+  {num:205,name:"Position Foldable Phone / Tablet Stand",cat:"phone"},
+  {num:206,name:"RE-FUEL Travel Charger for Digital Camera",cat:"cameras"},
+  {num:207,name:"ALIENWARE Internal Laptop Speaker",cat:"audio"},
+  {num:208,name:"SEALED CANON PIXMA 275 Black Ink Cartridge",cat:"office",status:"sealed"},
+  {num:209,name:"6-ft Mini DisplayPort to HDMI Cable 4K Ultra HD",cat:"cables"},
+  {num:210,name:"Bluetooth 5.0 USB Adapter",cat:"cables"},
+  {num:211,name:"6-ft USB 2.0 to USB Mini-B Cable",cat:"cables"},
+  {num:212,name:"Platinum USB-C to USB Adapter",cat:"cables"},
+  {num:213,name:"USB 2.0 Wireless 802.11N Adapter 300Mbps",cat:"cables"},
+  {num:214,name:"8-in-1 Screwdriver Set with Magnetic Pen",cat:"home"},
+  {num:215,name:"Mini DisplayPort to HDMI Adapter",cat:"cables"},
+  {num:216,name:"LBT USB to USB-C Adapter",cat:"cables"},
+  {num:217,name:"OCULUS QUEST-2 VR Headset 128GB with Controllers",cat:"gaming"},
+  {num:218,name:"PS-5 SONY DualSense Wireless Gaming Controller",cat:"gaming"},
+  {num:219,name:"Blue Ocean 100ml EDT Perfume / Cologne",cat:"health"},
+  {num:220,name:"OCULUS QUEST-2 Controller — As Is",cat:"gaming",status:"as-is"},
+  {num:221,name:"SONY PS-4 Gaming Console — As Is",cat:"gaming",status:"as-is"},
+  {num:222,name:"OCULUS QUEST-2 VR Headset — As Is",cat:"gaming",status:"as-is"},
+  {num:223,name:"HONEYWELL Soothing Comfort Humidifier — As Is",cat:"home",status:"as-is"},
+  {num:224,name:"Pack Precision Thumbstick for PS-5/PS-4",cat:"gaming"},
+  {num:225,name:"Smart Posture Corrector Sensor Belt",cat:"health"},
+  {num:226,name:"ROCKETFISH 4-ft Digital Optical Audio Cable",cat:"audio"},
+  {num:227,name:"CAT-6 Ethernet Cable with Connectors",cat:"cables"},
+  {num:228,name:"2GB Crucial DDR-3 RAM",cat:"electronics"},
+  {num:229,name:"KOBO AURA E-Book Reader — As Is",cat:"electronics",status:"as-is"},
+  {num:230,name:"PopSockets Phone Grip & Stand w/ Swappable Top",cat:"phone"},
+  {num:231,name:"SONY PS-4 Gaming Console — As Is",cat:"gaming",status:"as-is"},
+  {num:232,name:"12-Outlet Power Manager Surge Protector",cat:"electronics"},
+  {num:233,name:"DISINE REGINA 13-Piece Non-Stick Cookware Set",cat:"home"},
+  {num:234,name:"SEALED Blue Ocean 100ml EDT Perfume / Cologne",cat:"health",status:"sealed"},
+  {num:235,name:"Durable 3-in-1 Screwdriver Set with Keychain",cat:"home"},
+  {num:236,name:"Dual Hard Drive Docking Station",cat:"electronics"},
+  {num:237,name:"SEALED Blue Ocean 100ml EDT Perfume / Cologne",cat:"health",status:"sealed"},
+  {num:238,name:"6-ft USB File Transfer Cable",cat:"cables"},
+  {num:239,name:"Monitor HDMI Adapter",cat:"cables"},
+  {num:240,name:"M.2 NVMe to USB-C SSD Enclosure",cat:"electronics"},
+  {num:241,name:"BELKIN 30W Compact USB-C Wall Charger",cat:"phone"},
+  {num:242,name:"APPLE AirPods Pro Wireless Charging Case",cat:"audio"},
+  {num:243,name:"Mens Kenneth Cole Belt Size M",cat:"home"},
+  {num:244,name:"Ascend Motion Controlled HD Video Drone",cat:"electronics"},
+  {num:245,name:"Fila Mens Action-stride Energized Shoes Size 12",cat:"home"},
+  {num:246,name:"La-Z-Boy Coolrest Serene Foam Pillow — Pre-Owned",cat:"home",status:"used"},
+  {num:247,name:"Mens Steve Madden Boots Size 13",cat:"home"},
+  {num:248,name:"Bluetooth Sleep Mask Headphones",cat:"audio"},
+  {num:249,name:"TZGZT Nintendo Switch Travel Carrying Case",cat:"gaming"},
+  {num:250,name:"TZGZT Nintendo Switch Travel Carrying Case",cat:"gaming"},
+  {num:251,name:"Baynice NP-W235 Dual Slot Battery Charger",cat:"cameras"},
+  {num:252,name:"Official Midnight MacBook Air 15in Case",cat:"electronics"},
+  {num:253,name:"Fingertip Wireless Bluetooth Remote (Black)",cat:"electronics"},
+  {num:254,name:"Foldable Bluetooth Keyboard Portable Black",cat:"electronics"},
+  {num:255,name:"SUPFINE Magnetic for iPhone 14 & 13 Case",cat:"phone"},
+  {num:256,name:"360 Spin Stand — Work, Play, Create Stand",cat:"phone"},
+  {num:257,name:"Removal Installation All-in-One Kit",cat:"home"},
+  {num:258,name:"Shockproof Case for iPhone 17 Pro",cat:"phone"},
+  {num:259,name:"TORRAS Liquid Silicone Case for iPhone 17 Pro",cat:"phone"},
+  {num:260,name:"ANGEET Wireless HDMI Transmitter and Receiver 4K",cat:"cables"},
+  {num:261,name:"AboveTEK Retail Kiosk iPad Stand 360° Rotating",cat:"phone"},
+  {num:262,name:"Long Flights Travel Accessory",cat:"home"},
+  {num:263,name:"IMBZBK 3 Pack Screen Protector for iPhone 14",cat:"phone"},
+  {num:264,name:"TAURI for iPhone 17 Pro Max Case Full Camera Protection",cat:"phone"},
+  {num:265,name:"Laptop Battery E510KA-EJ033TS",cat:"electronics"},
+  {num:266,name:"Ailofy LED Floor Lamp with 16M Colors",cat:"lighting"},
+  {num:267,name:"90° Adjustable High Resolution Display",cat:"electronics"},
+  {num:268,name:"12W LED Black Light Bulb A19 2 Pack",cat:"lighting"},
+  {num:269,name:"BoostArea 9W LED Torchiere Floor Lamp",cat:"lighting"},
+  {num:270,name:"QUANA Airplane Toys Metal Plane Pull Back for Kids",cat:"home"},
+  {num:271,name:"Ailun Screen Protector for iPhone 14 Plus",cat:"phone"},
+  {num:272,name:"128GB Digital Voice Recorder with Playback Magnetic",cat:"electronics"},
+  {num:273,name:"Home Drinking Water Testing Kit 120 Strips + 4 Bacteria",cat:"health"},
+  {num:274,name:"EYPINS Security Ground Anchor Heavy Duty Alloy Steel",cat:"home"},
+  {num:275,name:"HDMI KVM Switch 8 Port 4K@30Hz",cat:"cables"},
+  {num:276,name:"MELOGAGA Bluetooth Wireless Gaming Mouse 2.4G",cat:"gaming"},
+  {num:277,name:"Peerock 360° Spin Magnetic Stand for iPhone 17 Pro",cat:"phone"},
+  {num:278,name:"2 Pack Replacement Remote Control for Roku Express",cat:"electronics"},
+  {num:279,name:"Mr. Pen Drawing Pens for Artists 6 Sizes Black",cat:"office"},
+  {num:280,name:"Granny Says Storage Bins 2-Pack",cat:"home"},
+  {num:281,name:"GRANNY SAYS Storage Chest — Brown",cat:"home"},
+  {num:282,name:"GRANNY SAYS Storage Chest — Cream",cat:"home"},
+  {num:283,name:"TAILI 20 Pack Vacuum Storage Bags",cat:"home"},
+  {num:284,name:"GRANNY SAYS Storage Chest — Brown",cat:"home"},
+  {num:285,name:"Granny Says 6-Shelf Closet Organizer",cat:"home"},
+  {num:286,name:"ZCCZ Black 4-Piece Bathroom Set",cat:"home"},
+  {num:287,name:"StorageWorks Fabric Storage Bins 45L",cat:"home"},
+  {num:288,name:"Lusinx 1080P Webcam",cat:"electronics"},
+  {num:289,name:"Lusinx 1080P Webcam",cat:"electronics"},
+  {num:290,name:"Lusinx 1080P Webcam",cat:"electronics"},
+  {num:291,name:"Foot and Calf Massager with Heat",cat:"health"},
+  {num:292,name:"Tile Life360 Mate Protective Holder",cat:"phone"},
+  {num:293,name:"EmeTerm Explore FDA-Cleared Anti-Nausea Device",cat:"health"},
+  {num:294,name:"SmartQ C368 USB 3.0 Card Reader",cat:"electronics"},
+  {num:295,name:"XGIMI Ceiling Mount for Projector",cat:"electronics"},
+  {num:296,name:"OC Acoustic Newport Enclosure Speaker",cat:"audio"},
+  {num:297,name:"Makeblock mBot Robot Kit with Controller",cat:"electronics"},
+  {num:298,name:"onn. HDMI DVD Player",cat:"electronics"},
+  {num:299,name:"KODAK Mini 2 Retro 4PASS Portable Photo Printer",cat:"cameras"},
+  {num:300,name:"HidrateSpark PRO Smart Tumbler Bundle",cat:"health"},
+  {num:301,name:"Rechargeable Game Activity Cube Toys",cat:"home"},
+  {num:302,name:"RENPHO Eyeris 1 Eye Massager with Heat",cat:"health"},
+  {num:303,name:"KODAK Instant Print 3\"x3\" Cartridge 30-Pack",cat:"cameras"},
+  {num:304,name:"Qimic Otoscope Ear Camera 1.38\" Display",cat:"health"},
+  {num:305,name:"Kodak 30 Pack 4PASS Real Photo 2.1\"x3.4\"",cat:"cameras"},
+  {num:306,name:"KODAK Dock 4PASS Photo Printer Cartridge",cat:"cameras"},
+  {num:307,name:"Stand with Cooling Fan",cat:"gaming"},
+  {num:308,name:"FIMEI Floor Lamp for Living Room",cat:"lighting"},
+  {num:309,name:"KODAK Mini 3 Retro Photo Printer",cat:"cameras"},
+  {num:310,name:"14 Inch Laptop Screen Extender 1080P IPS",cat:"electronics"},
+  {num:311,name:"A-Premium Brake Master Cylinder",cat:"home"},
+  {num:312,name:"A-Premium Wheel Bearing & Hub",cat:"home"},
+  {num:313,name:"SereneLife Decorative Tabletop LED Water Feature",cat:"home"},
+  {num:314,name:"Portable Container with Leak Proof Slide Lock",cat:"home"},
+  {num:315,name:"Monster S290 Bluetooth Speaker Portable",cat:"audio"},
+  {num:316,name:"KODAK Mini Shot 2 ERA Noir 2.1x3.4 Camera",cat:"cameras"},
+  {num:317,name:"LCD Display Screen (Without Touch Screen)",cat:"electronics"},
+  {num:318,name:"Inkless Portable Printer for Travel",cat:"electronics"},
+  {num:319,name:"Pulse Oximeter Fingertip TFT Screen with Lanyard",cat:"health"},
+  {num:320,name:"Replacement for Liftmaster 893LM 891LM Garage Remote",cat:"home"},
+  {num:321,name:"Kodak 30 Pack 4PASS Real Photo 2.1\"x3.4\"",cat:"cameras"},
+  {num:322,name:"dodowin Power Tools Accessories 2000mAh Battery",cat:"home"},
+  {num:323,name:"Pulse Oximeter Fingertip TFT Screen with Lanyard",cat:"health"},
+  {num:324,name:"Keychron M7 8K Wireless Mouse",cat:"electronics"},
+  {num:325,name:"AGPTEK Fog Machine 500W Smoke Machine",cat:"home"},
+  {num:326,name:"Facial & Neck Massager Red Light Therapy",cat:"health"},
+  {num:327,name:"ONE MIX Mini Pocket Projector",cat:"electronics"},
+  {num:328,name:"JESSY 3.7V Rechargeable Battery Flat",cat:"electronics"},
+  {num:329,name:"FTL Rechargeable Light Bulb Battery Backup",cat:"lighting"},
+  {num:330,name:"OEM Ignition Coil UF673 Compatible",cat:"home"},
+  {num:331,name:"ONE MIX Mini Pocket Projector",cat:"electronics"},
+  {num:332,name:"Foot Massager with Heat",cat:"health"},
+  {num:333,name:"Mini UPS Battery Backup 10400mAh",cat:"electronics"},
+  {num:334,name:"K&F Concept 2 Pack LP-E12 Batteries and Charger",cat:"cameras"},
+  {num:335,name:"Gxyamen Electrical Plugs and Sockets Safety",cat:"home"},
+  {num:336,name:"Embr Wave Cooling and Warming Wristband",cat:"health"},
+  {num:337,name:"High Performance MR90Y Battery for Dell",cat:"electronics"},
+  {num:338,name:"BOLNEY Ultrasonic Cleaning Machine",cat:"health"},
+  {num:339,name:"BOLNEY Ultrasonic Cleaning Machine",cat:"health"},
+  {num:340,name:"DIGITNOW! 35mm Slide and Film Viewer 3X",cat:"cameras"},
+  {num:341,name:"Temtop Air Quality Monitor PM2.5 PM10",cat:"health"},
+  {num:342,name:"STARTRC Photo Mini 4 Pro RC2/RC Screen Protector",cat:"cameras"},
+  {num:343,name:"BEVIGOR CR123A 3V Lithium Batteries 6-Pack",cat:"electronics"},
+  {num:344,name:"ORICO 3.5 Inch Hard Drive Case Protective",cat:"electronics"},
+  {num:345,name:"WiFi Bluetooth Mini Projector Built-in",cat:"electronics"},
+  {num:346,name:"Electric Train Set with Smoke Sound and Lights",cat:"home"},
+  {num:347,name:"JETech Camera Lens Protector for iPhone 14",cat:"phone"},
+  {num:348,name:"avedio links 8K HDMI Audio Extractor",cat:"cables"},
+  {num:349,name:"ETANA ENATA Professional Wireless Earphones",cat:"audio"},
+  {num:350,name:"K&F Concept 2 Pack LP-E12 Batteries and Charger",cat:"cameras"},
+  {num:351,name:"Windshield Wiper Blades Replacement",cat:"home"},
+  {num:352,name:"Smart Ink Remanufactured Ink Cartridge",cat:"office"},
+  {num:353,name:"Ghost Campfire Flickering Night Light 3D",cat:"lighting"},
+  {num:354,name:"2Pcs Tobasovk 3 Prong Light Socket Adapter",cat:"lighting"},
+  {num:355,name:"Gritin 19 LED Rechargeable Book Light",cat:"lighting"},
+  {num:356,name:"InfinitiKloud Charge Secure Computer Storage",cat:"electronics"},
+  {num:357,name:"Remote Control Page Turner for Kindle",cat:"electronics"},
+  {num:358,name:"iPazzPort Mini Bluetooth Keyboard with Touchpad",cat:"electronics"},
+  {num:359,name:"GeForce GT 610 2G DDR3 Low Profile Graphics Card",cat:"electronics"},
+  {num:360,name:"KODAK Dock Photo Printer Cartridge PHC-80",cat:"cameras"},
+  {num:361,name:"Therapy Back Neck Shoulder Massager",cat:"health"},
+  {num:362,name:"Ultrasonic Dog Training Bark Control Device",cat:"home"},
+  {num:363,name:"ZEALOT Phone Stand with Wireless Bluetooth Speaker",cat:"audio"},
+  {num:364,name:"Electronic Drum Set Air Drumsticks",cat:"audio"},
+  {num:365,name:"Picture Keeper Connect Photo & Video USB",cat:"electronics"},
+  {num:366,name:"TopScan Lite OBD2 Scanner Bi-Directional",cat:"electronics"},
+  {num:367,name:"ELEGOO UNO R3 Board ATmega328P with USB",cat:"electronics"},
+  {num:368,name:"Operation Good Boy Extra Large Grenade Dog Toy",cat:"home"},
+  {num:369,name:"RCA Universal Remote RCR003RWDE",cat:"electronics"},
+  {num:370,name:"NETGEAR WAX202 AX1800 Business WiFi",cat:"electronics"},
+  {num:371,name:"COMFIER Cordless Heating Pad with Massager",cat:"health"},
+  {num:372,name:"SWEETFULL Mini Portable Fan Rechargeable",cat:"home"},
+  {num:373,name:"ULTRAHUMAN Ring AIR Size 7 — Air Gold",cat:"health"},
+  {num:374,name:"celpack Shoulder and Neck Massager",cat:"health"},
+  {num:375,name:"SYMA Remote Control Helicopter S52H",cat:"home"},
+  {num:376,name:"SWTOIPIG RC Robot Toys for Kids",cat:"home"},
+  {num:377,name:"Snailax Back Massager for Back Pain Deep Tissue",cat:"health"},
+  {num:378,name:"SIMOLIO TV Headphones Wireless with Spare",cat:"audio"},
+  {num:379,name:"PS Portal Charger P5 Stand and Cooling",cat:"gaming"},
+  {num:380,name:"Rechargeable COB Keychain Flashlight Ultra",cat:"home"},
+  {num:381,name:"Mini Chainsaw Cordless 6 Inch Electric",cat:"home"},
+  {num:382,name:"RENPHO Eyeris Masc Head & Eye Massager",cat:"health"},
+  {num:383,name:"AILBTON LED Neon Rope Lights 32.8ft Controlled",cat:"lighting"},
+  {num:384,name:"Ksipze LED Lights Strip for Bedroom 100ft",cat:"lighting"},
+  {num:385,name:"RGB+IC LED Neon Rope Lights 10ft Music Sync",cat:"lighting"},
+  {num:386,name:"TOSY Flying Ring 36 RGB Multicolor LEDs",cat:"home"},
+  {num:387,name:"LED Note Board with Colors 13.8\"x10.3\"",cat:"office"},
+  {num:388,name:"Car Vacuum Cleaner 16000PA Mini",cat:"home"},
+  {num:389,name:"Linkax Soccer Gifts 3D Night Light",cat:"lighting"},
+  {num:390,name:"Anker 2-Pack Dual Port 12W USB A Charger",cat:"phone"},
+  {num:391,name:"Rechargeable Knee Massage Machine",cat:"health"},
+  {num:392,name:"BlueFire Mini Drone for Kids",cat:"home"},
+  {num:393,name:"DYONDER Wireless Controller for PS4",cat:"gaming"},
+  {num:394,name:"Battery Operated LED Strip Lights RGB",cat:"lighting"},
+  {num:395,name:"Panasonic C Battery Pack of 2",cat:"electronics"},
+  {num:396,name:"Electric Scrubber Brush for Kitchen",cat:"home"},
+  {num:397,name:"Electric Scrubber Brush for Kitchen",cat:"home"},
+  {num:398,name:"Anime Character 7 Color Change Decor",cat:"lighting"},
+  {num:399,name:"Hockey Gifts 3D Ice Hockey Night Lamp",cat:"lighting"},
+  {num:400,name:"Open Ear Headphones Open Ear Buds",cat:"audio"},
+  {num:401,name:"Mini Portable Sticker Printer Mini Thermal",cat:"office"},
+  {num:402,name:"LED Wall Torch Light 4-Color Night Light",cat:"lighting"},
+  {num:403,name:"Lepro Small UV Flashlights with AAA",cat:"home"},
+  {num:404,name:"12.5\" Portable DVD Player with 10.5\" Swivel Screen",cat:"electronics"},
+  {num:405,name:"MGLSDeet Electric Spin Scrubber",cat:"home"},
+  {num:406,name:"Wizard Decorations Night Light with Magic",cat:"lighting"},
+  {num:407,name:"Hair Oil Applicator with Electric Scalp Massager",cat:"health"},
+  {num:408,name:"Self Cleaning Grooming Rake Brush for Pets",cat:"home"},
+  {num:409,name:"LED Light Up Wristbands with USB Charging",cat:"lighting"},
+  {num:410,name:"Cordless Electric Razor 3-in-1 Shaver IPX7",cat:"health"},
+  {num:411,name:"Bunny Night Light 7-Color Glow Dimmable",cat:"lighting"},
+  {num:412,name:"KEZKALS 9-in-1 Multifunction Pen Gift",cat:"office"},
+  {num:413,name:"TriPro Darth Vader 3D Illusion LED Desk Lamp",cat:"lighting"},
+  {num:414,name:"Mini Portable Sticker Printer Bluetooth",cat:"office"},
+  {num:415,name:"15-in-1 Handheld Steam Cleaner 2800W",cat:"home"},
+  {num:416,name:"Ninja Blast Hover Soccer Light-Up Ball Indoor",cat:"home"},
+  {num:417,name:"2025 Ultrasonic Retainer Cleaner Machine",cat:"health"},
+  {num:418,name:"SingTok 12PCS 6.5 Inches Flameless LED Fake Candles",cat:"lighting"},
+  {num:419,name:"LED Wall Torch Light 4-Color Night Light",cat:"lighting"},
+  {num:420,name:"Pin Male to GPU Dual Adapter",cat:"cables"},
+  {num:421,name:"MANSCAPED The Lawn Mower 3.0 PLUS Groin Groomer",cat:"health"},
+  {num:422,name:"FYOUNG All in One Cooling Stand & Charger",cat:"gaming"},
+  {num:423,name:"Hidden Camera Detector Pen Portable",cat:"electronics"},
+  {num:424,name:"Hidden Camera Detector Pen Portable",cat:"electronics"},
+  {num:425,name:"Auto Electric Can Opener Rechargeable",cat:"home"},
+  {num:426,name:"Canon PG-275 Black Ink Cartridge for PIXMA",cat:"office"},
+  {num:427,name:"62\" Tripod & Selfie Stick for Phones",cat:"cameras"},
+  {num:428,name:"CableMod ModMesh Sleeved Internal USB 3.0",cat:"cables"},
+  {num:429,name:"Binoculars for Adults High Powered",cat:"electronics"},
+  {num:430,name:"Enabot EBO 2K Camera Robot ROLA Mini",cat:"electronics"},
+  {num:431,name:"Luminette 3 Light Therapy Glasses",cat:"health"},
+  {num:432,name:"Homey Bridge Smart Home Hub",cat:"electronics"},
+  {num:433,name:"Redragon K621 Horus TKL Wireless RGB Keyboard",cat:"gaming"},
+  {num:434,name:"Kidde Carbon Monoxide Detector Plug In",cat:"home"},
+  {num:435,name:"TheraGun Therabody WaveDuo Ergonomic Massager",cat:"health"},
+  {num:436,name:"BACKBONE One Mobile Gaming Controller",cat:"gaming"},
+  {num:437,name:"Nesugar G3 Steamer for Clothes Portable",cat:"home"},
+  {num:438,name:"8000mAh×2 Heated Socks for Men Women",cat:"health"},
+  {num:439,name:"Hatch Rest Baby Sound Machine Night Light",cat:"home"},
+  {num:440,name:"Wireless HDMI Dongle Adapter Transmitter",cat:"cables"},
+  {num:441,name:"DEERC Apache RC Helicopter for Kids 8-12",cat:"home"},
+  {num:442,name:"Hatch Rest Baby Sound Machine Night Light",cat:"home"},
+  {num:443,name:"Wireless Keyboard and Mouse Combo 9-in-1",cat:"electronics"},
+  {num:444,name:"UGREEN Nexode Power Bank 20000mAh 145W",cat:"phone"},
+  {num:445,name:"TELESIN Magnetic Neck Mount for Phones",cat:"cameras"},
+  {num:446,name:"Hiking Boot Insoles Men Women Arch Support",cat:"health"},
+  {num:447,name:"Adventurers Typewriter Style Retro Keyboard",cat:"electronics"},
+  {num:448,name:"Party Lights DJ Disco Lights Strobe Stage",cat:"lighting"},
+  {num:449,name:"LED Mask with Bluetooth Programmable",cat:"electronics"},
+  {num:450,name:"Scientific Calculator with Notepad TRELC",cat:"electronics"},
+  {num:451,name:"Rechargeable LED Laser Headlamp",cat:"home"},
+  {num:452,name:"Kodak Mini Shot 3 ERA 2-in-1 Instant Camera",cat:"cameras"},
+  {num:453,name:"Sunoony Walkman CD Player Portable",cat:"audio"},
+  {num:454,name:"UGREEN HDMI Switch 4K Bidirectional",cat:"cables"},
+  {num:455,name:"Dragon Tree Hugger Garden Decor 9.3 Inch",cat:"home"},
+  {num:456,name:"Diwali Decorations Items Diwali Lights 12-Pack",cat:"lighting"},
+  {num:457,name:"APLOS AP50 Scuba Diving Flashlight",cat:"home"},
+  {num:458,name:"12000mAh Heated Vest Battery Pack 5V 2A",cat:"health"},
+  {num:459,name:"Magnetic Phone Car Holder",cat:"phone"},
+  {num:460,name:"KODAK Instant Print 3\"x3\" Cartridge 30-Pack",cat:"cameras"},
+  {num:461,name:"Markers 48 Colors Art Drawing Set",cat:"office"},
+  {num:462,name:"Vishine 15ml Gel Nail Polish Soak Off UV",cat:"health"},
+  {num:463,name:"Survival Gear & Tools Gift Set for Men Dad",cat:"home"},
+  {num:464,name:"Light Bulbs",cat:"lighting"},
+  {num:465,name:"DELTAHUB Carpio 2.0 Right-Handed Wrist Rest",cat:"electronics"},
+  {num:466,name:"Hole 20 Tone Mouth Harmonica",cat:"audio"},
+  {num:467,name:"Segomo Tools 360 Degree Swivel Joint Slip",cat:"home"},
+  {num:468,name:"M. ROSENFELD Black Hookah Set",cat:"home"},
+  {num:469,name:"Hookah Pump Shisha Starter Electric Air Kit",cat:"home"},
+  {num:470,name:"Morily 24pcs Fake Nails Matte Pure Color",cat:"health"},
+  {num:471,name:"Wiper Washer Switch for Hyundai",cat:"home"},
+  {num:472,name:"BENFEI USB C to VGA Adapter Thunderbolt",cat:"cables"},
+  {num:473,name:"TREATLIFE Smart Dimmer Plug 2.4GHz WiFi",cat:"electronics"},
+  {num:474,name:"TESmart 1080P 60Hz Long Range 984ft USB KVM",cat:"electronics"},
+  {num:475,name:"Futurebatt BT04XL Battery Replacement for HP",cat:"electronics"},
+  {num:476,name:"elago R4 Retro Apple TV Remote Case",cat:"electronics"},
+  {num:477,name:"Original HP 63 Tri-Color Ink Cartridge",cat:"office"},
+  {num:478,name:"JJC Metal Hand Grip L-Bracket & Shutter Release",cat:"cameras"},
+  {num:479,name:"Digital Clock Large Display LED Alarm",cat:"home"},
+  {num:480,name:"TELESIN Fun Shot Magnetic Phone Camera DSLR Mount",cat:"cameras"},
+  {num:481,name:"TESmart USB 3.0 HDMI KVM Switch 2 Monitors",cat:"electronics"},
+  {num:482,name:"XHDATA D221 NOAA Weather Radio Portable AM",cat:"electronics"},
+  {num:483,name:"Stylish Lightweight Portable Scalable Tripod",cat:"cameras"},
+  {num:484,name:"FM Prominent Flavored Air Device",cat:"home"},
+  {num:485,name:"GeForce GT 610 2G DDR3 Low Profile Graphics Card",cat:"electronics"},
+  {num:486,name:"Aviation Plotter Aviation Slide Rule",cat:"home"},
+  {num:487,name:"12000mAh Heated Vest Battery Pack 5V 2A",cat:"health"},
+  {num:488,name:"Green Laser",cat:"electronics"},
+  {num:489,name:"6.7\" Digital Alarm Clock for Kids Bedside",cat:"home"},
+  {num:490,name:"E-KNOW Bubble Wand 4 Pack Giant Bubble",cat:"home"},
+  {num:491,name:"KODAK Mini Shot 3 Retro 4PASS 2-in-1 Camera",cat:"cameras"},
+  {num:492,name:"Stylus Pen for Android and iOS",cat:"phone"},
+  {num:493,name:"KODAK Mini Shot 2 Retro 4PASS 2-in-1 Camera",cat:"cameras"},
+  {num:494,name:"Thyle 3 Pcs Thanksgiving Pumpkin Table Decor",cat:"home"},
+  {num:495,name:"UUQ Tactical 1x30mm Reflex Green/Red/Blue Sight",cat:"home"},
+  {num:496,name:"Homebuds 22lb/10kg Digital Food Scale",cat:"home"},
+  {num:497,name:"KIWI Design Silicone Facial Cover for VR",cat:"gaming"},
+  {num:498,name:"Kodak ICRG-230 4PASS Printer Cartridges",cat:"cameras"},
+  {num:499,name:"Mpro Kids Headphones",cat:"audio"},
+  {num:500,name:"Hydration Bladder 1.5-3L Water Bladder",cat:"health"},
+  {num:501,name:"Kratax 1.5V Rechargeable AA Lithium Batteries",cat:"electronics"},
+  {num:502,name:"Allegory Quality Black Tattoo Ink",cat:"health"},
+  {num:503,name:"Small Powerful Blower 100-240V 1500mAh",cat:"home"},
+  {num:504,name:"Olivia Micro Lamp Rechargeable Cordless",cat:"lighting"},
+  {num:505,name:"65W USB-C Laptop Charger Chromebook Compatible",cat:"electronics"},
+  {num:506,name:"Screen Protector Privacy Filter for Laptop",cat:"electronics"},
+  {num:507,name:"KODAK Dock Era 4PASS Photo Printer Cartridge",cat:"cameras"},
+  {num:508,name:"2Pcs 5600mAh F750 Battery + Dual USB Charge Set",cat:"cameras"},
+  {num:509,name:"102W Surface Book 2 Charger for Microsoft",cat:"electronics"},
+  {num:510,name:"Power Bank Solar Charger 42800mAh",cat:"phone"},
+  {num:511,name:"Power-Bank Solar Charger 42800mAh",cat:"phone"},
+  {num:512,name:"Nestour Interior Car Neon Lights",cat:"lighting"},
+  {num:513,name:"Spigen Thin Fit Designed for Apple Watch",cat:"phone"},
+  {num:514,name:"Official Creality 8PCS 3D Printer High-end Nozzles",cat:"electronics"},
+  {num:515,name:"House of the Dragon Season 2 (DVD)",cat:"home"},
+  {num:516,name:"Spy Gear Night Goggles",cat:"home"},
+  {num:517,name:"Marvel Legends Series Venom Action Figure",cat:"home"},
+  {num:518,name:"Balance: Paid in Full (Mystery Item)",cat:"misc"},
+  {num:519,name:"Lap Desk with Cushion, Fits up to 17\"",cat:"office"},
+  {num:520,name:"Travel Backpack for Women Men Airline Approved",cat:"home"},
+  {num:521,name:"Background Stand",cat:"cameras"},
+  {num:522,name:"BEXEVUE Home Office Desk 32 inch Computer Desk",cat:"office"},
+  {num:523,name:"SmallRig x Potato Jet Professional Tripod",cat:"cameras"},
+  {num:524,name:"Ropes",cat:"misc"},
+  {num:525,name:"Power Supplies, Printer, Laptop Screens, Laptops",cat:"misc"},
+  {num:526,name:"Mystery Box of Cables & Electronics",cat:"misc"},
+  {num:527,name:"Bin of Toners",cat:"misc"},
+  {num:528,name:"Box of Toner, Phone and CDs",cat:"misc"},
+  {num:529,name:"Batteries (Assorted)",cat:"electronics"},
+  {num:530,name:"FTC1406AWN TV Stand with Mount",cat:"electronics"},
+  {num:531,name:"MYH05804WW TV Stand with Mount",cat:"electronics"},
+  {num:532,name:"AERLANG Shiatsu Neck and Back Massager — Not Tested",cat:"health",status:"as-is"},
+  {num:533,name:"Eokeiy Mini Projector — Not Tested",cat:"electronics",status:"as-is"},
+  {num:534,name:"2 Smart Sockets",cat:"electronics"},
+  {num:535,name:"Mobile Phone Video Amplifier Enlarged Screen",cat:"phone"},
+  {num:536,name:"3.5 Inch External Hard Drive Enclosure",cat:"electronics"},
+  {num:537,name:"Film Scanner",cat:"cameras"},
+  {num:538,name:"Reading Sunglasses",cat:"health"},
+  {num:539,name:"3 Fingerbot White",cat:"electronics"},
+  {num:540,name:"WTXUP TX-1200 PCI-E Wireless Card",cat:"electronics"},
+  {num:541,name:"Wi-Fi Dongle",cat:"electronics"},
+  {num:542,name:"PS5 Console Stand",cat:"gaming"},
+  {num:543,name:"Scotch Tape",cat:"office"},
+  {num:544,name:"Table Lamp",cat:"lighting"},
+  {num:545,name:"8.5 Inch Clip-On Fan",cat:"home"},
+  {num:546,name:"Air Cooler",cat:"home"},
+  {num:547,name:"Probreeze Dehumidifier",cat:"home"},
+  {num:548,name:"2 GDStoMe DC Cooling Fan System",cat:"electronics"},
+  {num:549,name:"Tufting Gun",cat:"home"},
+  {num:550,name:"Portable Projection Screen",cat:"electronics"},
+  {num:551,name:"Long Black Curtain or Screen",cat:"home"},
+  {num:552,name:"Multifunction Work Light",cat:"lighting"},
+  {num:553,name:"Miscellaneous Data Cables",cat:"misc"},
+  {num:554,name:"Miscellaneous Electronic Wires",cat:"misc"},
+  {num:555,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:556,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:557,name:"Hoodie Charging Stand for Apple Watch & USB-C",cat:"phone"},
+  {num:558,name:"GPS Tracker SIM",cat:"electronics"},
+  {num:559,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:560,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:561,name:"4.5X Phone Lens and Doorbell",cat:"phone"},
+  {num:562,name:"Long Range Wireless Audio Receiver",cat:"audio"},
+  {num:563,name:"10 Memory Cards with SD Adapter",cat:"electronics"},
+  {num:564,name:"Elemake BLE Wi-Fi Gateway",cat:"electronics"},
+  {num:565,name:"HDMI Braided Cables, RCA/TCA Converters, HDD Case",cat:"cables"},
+  {num:566,name:"AC Adapters (Assorted)",cat:"cables"},
+  {num:567,name:"Wireless Display Adapter, 2 HDMI Splitters & HD",cat:"cables"},
+  {num:568,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:569,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:570,name:"Microsoft Laptop Charger, LED Strip Controller",cat:"electronics"},
+  {num:571,name:"Miscellaneous Electronic Wires",cat:"misc"},
+  {num:572,name:"Miscellaneous Electronic Cables and Stuff",cat:"misc"},
+  {num:573,name:"Miscellaneous Electronic Cables, Chargers",cat:"misc"},
+  {num:574,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:575,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:576,name:"Clarity Professional C4220+ 5.8GHz Cordless Phone",cat:"electronics"},
+  {num:577,name:"HD Video Converter and Super Supply",cat:"cables"},
+  {num:578,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:579,name:"Miscellaneous Electronic Wires, Charging Cables",cat:"misc"},
+  {num:580,name:"Projector Lamp",cat:"electronics"},
+  {num:581,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:582,name:"Miscellaneous Cables, Phone Accessories",cat:"misc"},
+  {num:583,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:584,name:"Miscellaneous Electronic Stuff",cat:"misc"},
+  {num:585,name:"Miscellaneous Electronic Wires and Stuff",cat:"misc"},
+  {num:586,name:"Miscellaneous Electronic Cables, Communication",cat:"misc"},
+  {num:587,name:"Miscellaneous Electronic Stuff, Cables",cat:"misc"},
+  {num:588,name:"Wine Ice Bucket and Wine Opener",cat:"home"},
+  {num:589,name:"Champagne Bucket",cat:"home"},
+  {num:590,name:"2 Red Bank Mats",cat:"home"},
+  {num:591,name:"Storage Tote",cat:"home"},
+  {num:592,name:"Hitachi 12V Drill Kit — NEW",cat:"home",status:"new"},
+  {num:593,name:"7 Foot Tripod",cat:"cameras"},
+  {num:594,name:"Bang & Olufsen Beoplay E8 True Wireless Earbuds",cat:"audio"},
+  {num:595,name:"Hex Key Set",cat:"home"},
+  {num:596,name:"3 Bookshelves",cat:"home"},
+  {num:597,name:"Ice Cream Maker and Warm Mint Humidifier",cat:"home"},
+  {num:598,name:"Hidden Camera Pen 64GB Spy Camera 1080P",cat:"electronics"},
+  {num:599,name:"iNextStation RGB Neon LED Strip Lights 16.4ft",cat:"lighting"},
+  {num:600,name:"Mechanical Stop Watch SXJ504 Handheld Sports Chronograph",cat:"home"},
+  {num:601,name:"2 Pack Magnetic Wireless Charger iPhone 15W — White",cat:"phone"},
+  {num:602,name:"Screen Protector 2 Pack for Amazon Fire",cat:"electronics"},
+  {num:603,name:"Amazon Basics Battery Charger for AA and AAA",cat:"electronics"},
+  {num:604,name:"Temdan Magnetic Compatible with iPhone 14 Case",cat:"phone"},
+  {num:605,name:"UBeesize 67\" Phone Tripod Stand — Final Sale Parts",cat:"cameras",status:"as-is"},
+  {num:606,name:"Battery Operated Starry Lights 18ft 50 Micro LEDs",cat:"lighting"},
+  {num:607,name:"EASTHILL Big Capacity Pencil Case Pencil Pouch",cat:"office"},
+  {num:608,name:"SmartSee MiraScreen Wireless Display Adapter 1080P",cat:"electronics"},
+  {num:609,name:"ENERGETIC SMARTER LIGHTING LED Desk Lamp Flexible",cat:"lighting"},
+  {num:610,name:"ArtSocket Wooden Wall Clock Silent Non-Ticking",cat:"home"},
+  {num:611,name:"YEAJON 8 Inch Letter Stencils and Numbers 42 Pcs",cat:"office"},
+  {num:612,name:"12 Adhesive Finger Bandage Strips",cat:"health"},
+  {num:613,name:"3M 20 LED Stars Fairy String Battery Powered",cat:"lighting"},
+  {num:614,name:"SC/APC to SC/APC Fiber Optic Internet Cable",cat:"cables"},
+  {num:615,name:"2 Pcs Mist Maker Fogger Ultrasonic Fog Machine",cat:"home"},
+  {num:616,name:"Apple USB-C to Pencil 1st Generation Adapter",cat:"phone"},
+  {num:617,name:"Naturium Bio-Lipid Restoring Body Lotion",cat:"health"},
+  {num:618,name:"CeraVe Salicylic Acid Renewing SA Exfoliating Body",cat:"health"},
+  {num:619,name:"PS5 Slim Cooling Fan with Colorful Light Strip",cat:"gaming"},
+  {num:620,name:"Aveeno Calm + Restore PHA Exfoliator 118mL",cat:"health"},
+  {num:621,name:"Ear Wax Removal Electric Ear Irrigation Flushing System",cat:"health"},
+  {num:622,name:"3 Pack Business Blue Light Blocking Reading Glasses",cat:"health"},
+  {num:623,name:"CW Beggs Sensitive Skin Moisturizer for Men",cat:"health"},
+  {num:624,name:"SUPFINE Magnetic Case for iPhone 17 Pro Max",cat:"phone"},
+  {num:625,name:"REVAMP Progloss Volume & Wave Ceramic Hot Brush",cat:"health"},
+  {num:626,name:"SEALED New Rabbit Ear Powerful Personal Massager",cat:"health",status:"sealed"},
+  {num:627,name:"BENECREAT 6Pcs Walnut Dowel Rod Sticks",cat:"home"},
+  {num:628,name:"KLIC-5000 USB Charger for Kodak EasyShare",cat:"cameras"},
+  {num:629,name:"TYNOR Hinged Knee Brace Double Strap Adjustable",cat:"health"},
+  {num:630,name:"Smart Bracelet Wearable Activity & Fitness Tracker",cat:"health"},
+  {num:631,name:"Hunt A Killer Death at The Dive Bar Murder Mystery",cat:"home"},
+  {num:632,name:"WAHL Canada Deluxe Groomer Rechargeable 6-in-1",cat:"health"},
+  {num:633,name:"Magnetic Dry Erase White Board for Fridge 2 Pack",cat:"office"},
+  {num:634,name:"Descendants Pocket Watch Official Disney",cat:"home"},
+  {num:635,name:"Five Star 1-Subject Notebook + Study App 8.5\"",cat:"office"},
+  {num:636,name:"Amazon Basics 3 Hole Punch 10 Sheet Capacity",cat:"office"},
+  {num:637,name:"Phone Swing Phone Rocker for Pokemon Go",cat:"electronics"},
+  {num:638,name:"Hipat Whistle 2 Pack Stainless Steel Sports",cat:"home"},
+  {num:639,name:"TP-Link AXE5400 WiFi 6E USB Adapter",cat:"electronics"},
+  {num:640,name:"Bluetooth Keyboard Case for Fire HD 10 13th Gen",cat:"electronics"},
+  {num:641,name:"FAKILO 18mm U-Shape Flexible Furniture Edge Banding",cat:"home"},
+  {num:642,name:"Master Magnetics Flexible Magnet Strip with Vinyl Coat",cat:"home"},
+  {num:643,name:"Revlon Compact Hair Dryer Lightweight",cat:"health"},
+  {num:644,name:"Beyblade X Obsidian Shell 4-60D Booster Pack",cat:"home"},
+  {num:645,name:"Nioxin Density Defend Styling Root Lifting Spray",cat:"health"},
+  {num:646,name:"ATTITUDE Fluoride-Free Fresh Breath Toothpaste",cat:"health"},
+  {num:647,name:"Hilroy Studio Art Paper Scrapbook 10\"x12\"",cat:"office"},
+  {num:648,name:"4K HDMI Video Capture Card Game Capture",cat:"electronics"},
+  {num:649,name:"LeapFrog LeapMove Active Learning Video Game System",cat:"gaming"},
+  {num:650,name:"FINAL SALE Mystery Box — See Pictures",cat:"misc",status:"as-is"},
+  {num:651,name:"Open Box Power On User Manual Shiatsu Massager",cat:"health",status:"as-is"},
+  {num:652,name:"Lifepro Cordless Hand Massager for Hands & Wrists",cat:"health"},
+  {num:653,name:"Titan 63024 32oz Ball Pein Hammer",cat:"home"},
+  {num:654,name:"VELPEAU Thumb Wrist Support Brace CMC Thumb Spica",cat:"health"},
+  {num:655,name:"Command Medium Refill White 36-Strips",cat:"home"},
+  {num:656,name:"Command Medium Picture Hanging Strips Damage-Free",cat:"home"},
+  {num:657,name:"Transformers One 2-in-1 Bumblebee B-127 Robot Figure",cat:"home"},
+  {num:658,name:"BLACK+DECKER 2-in-1 Rice Cooker and Food Steamer 16",cat:"home"},
+  {num:659,name:"Schleich Eldrador 10\" Shadow Dragon Fantasy Figure",cat:"home"},
+  {num:660,name:"5 Pack Large Plastic Zipper Pouches B4 12×15\"",cat:"home"},
+  {num:661,name:"Colored Pencils 24-Count Set",cat:"office"},
+  {num:662,name:"Performance Tool W54012 Heavy Duty Plastic",cat:"home"},
+  {num:663,name:"Weighted Eye Mask for Sleeping Blackout",cat:"health"},
+  {num:664,name:"4 Pairs Metatarsal Gel Pads Toe Separators",cat:"health"},
+  {num:665,name:"Nesapto Paper Towel Holder Countertop Wooden",cat:"home"},
+  {num:666,name:"Snailax Shiatsu Lower Back Neck Massager with Heat",cat:"health"},
+  {num:667,name:"Carry On Backpack 50L Extra Travel Laptop Backpack",cat:"home"},
+  {num:668,name:"Pendaflex File Folders End Tab Reinforced Full Tab",cat:"office"},
+  {num:669,name:"Benjia 4 Pack Poster Frame Magnetic Light 20x30",cat:"home"},
+  {num:670,name:"Snailax Vibration Massage Seat Cushion with Heat",cat:"health"},
+  {num:671,name:"Snailax 2-in-1 Shiatsu Foot and Back Massager",cat:"health"},
+  {num:672,name:"LEVOIT Humidifier 2.5L Top Fill Cool Mist",cat:"home"},
+  {num:673,name:"Snailax 2-in-1 Shiatsu Foot and Back Massager",cat:"health"},
+  {num:674,name:"Compression Packing Cubes 4 Set Luggage Organizer",cat:"home"},
+  {num:675,name:"Lava Original Lamp 14.5\" Aurora Borealis",cat:"home"},
+  {num:676,name:"Spigen Ultra Hybrid MagFit Case for iPhone 17 Pro Max",cat:"phone"},
+  {num:677,name:"30pcs Baby Ear Covers for Bath + Waterproof Cotton",cat:"health"},
+  {num:678,name:"Red Light Therapy Device for Face & Neck 7 Color",cat:"health"},
+  {num:679,name:"Aveeno Daily Moisturizing Face Cream Facial & Neck",cat:"health"},
+  {num:680,name:"Ice Packs for Insulated Medication 19.3x7cm",cat:"health"},
+  {num:681,name:"Double Sided Tape for Clothes Body Fashion Tape 75P",cat:"health"},
+  {num:682,name:"Frigidaire Electric Element — Burned Final Sale",cat:"home",status:"as-is"},
+  {num:683,name:"Skull Hooker Mount",cat:"home"},
+  {num:684,name:"Gillette Beard Balm",cat:"health"},
+  {num:685,name:"Basics Storage Container",cat:"home"},
+  {num:686,name:"Mattress Bags Twin",cat:"home"},
+  {num:687,name:"Art3d Hook Loop Tape",cat:"home"},
+  {num:688,name:"USB Video Capture Card",cat:"cables"},
+  {num:689,name:"Magazine File Holder",cat:"office"},
+  {num:690,name:"Woven Laundry Basket",cat:"home"},
+  {num:691,name:"khanka Hard Case",cat:"home"},
+  {num:692,name:"TESLYAR Phone Dock",cat:"phone"},
+  {num:693,name:"BINO Storage Drawers",cat:"home"},
+  {num:694,name:"YRXVW Face Pad",cat:"health"},
+  {num:695,name:"Vorspack Toiletry Bag",cat:"home"},
+  {num:696,name:"WRENBEN Notebook 2pc",cat:"office"},
+  {num:697,name:"Youeon Step Stool",cat:"home"},
+  {num:698,name:"DOHIMGIO Pill Organizer",cat:"health"},
+  {num:699,name:"ocuvaep Faraday Bags",cat:"electronics"},
+  {num:700,name:"JSAUX USB-C HDMI Cable",cat:"cables"},
+  {num:701,name:"Anleo Hard Case",cat:"home"},
+  {num:702,name:"Electronic Organizer Bag",cat:"home"},
+  {num:703,name:"Furlove AFO Brace",cat:"health"},
+  {num:704,name:"OHill Cable Organizer",cat:"cables"},
+  {num:705,name:"BIFONODKR Charging Dock",cat:"phone"},
+  {num:706,name:"KEKUCULL Controller Charger",cat:"gaming"},
+  {num:707,name:"Rubies Bow Arrow Set",cat:"home"},
+  {num:708,name:"Anti-Theft Doorbell Mount",cat:"home"},
+  {num:709,name:"Hommie Cat Sticky Notes",cat:"office"},
+  {num:710,name:"Brita 27 Cup Dispenser",cat:"home"},
+  {num:711,name:"Cheerwing RC Helicopter",cat:"home"},
+  {num:712,name:"Apple MFi Certified Lightning to HDMI Adapter",cat:"phone"},
+  {num:713,name:"HGomx Fire Dragon Lamp Light 3D Printed Night",cat:"lighting"},
+  {num:714,name:"HelloBaby Baby Monitor No WiFi Video Baby",cat:"electronics"},
+  {num:715,name:"Kogonee Wooden Digital Alarm Clock 0-100%",cat:"home"},
+  {num:716,name:"ANGTUO Dog Night Light Dimmable Animal Lamp",cat:"lighting"},
+  {num:717,name:"Back Massager Chair Pad with Heat",cat:"health"},
+  {num:718,name:"Lightailing Light for Lego 76406 Hungarian",cat:"lighting"},
+  {num:719,name:"Motorcycle Cremation Urn Necklace for Ashes",cat:"home"},
+  {num:720,name:"Moon Cremation Necklace Memorial Jewelry",cat:"home"},
+  {num:721,name:"Car LED Strip Lights 4PCS 48 LEDs Kit",cat:"lighting"},
+  {num:722,name:"Car LED Strip Lights 4PCS 48 LEDs Kit",cat:"lighting"},
+  {num:723,name:"FANXIN Car Laptop Desk for Tesla Model Y/3",cat:"home"},
+  {num:724,name:"Mzsticey 100% At Work Notebook",cat:"office"},
+  {num:725,name:"DHGPTS Spiral Journal A5 Hardcover Notebook",cat:"office"},
+  {num:726,name:"LOTUNY Cable Clips Wire Organizer 8 Pack",cat:"cables"},
+  {num:727,name:"Instant Pot Duo 7-in-1 Cooker 3 Qt",cat:"home"},
+  {num:728,name:"SAMSUNG 32-Inch 4K UHD Monitor with FreeSync",cat:"electronics"},
+  {num:729,name:"LZIMU Buddha Canvas Art Zen Print Framed",cat:"home"},
+  {num:730,name:"LG 27U631A-B 27\" QHD 100Hz USB-C IPS Monitor",cat:"electronics"},
+  {num:731,name:"Floor Projector Stand Mount Telescopic",cat:"electronics"},
+  {num:732,name:"Boho Abstract Lines Canvas Wall Art Unframed",cat:"home"},
+  {num:733,name:"RockJam 61 Key Keyboard with Stand and Bench",cat:"audio"},
+  {num:734,name:"Lefant LS1 Lidar Robot Vacuum 3200Pa",cat:"home"},
+  {num:735,name:"ALLINCOZY Graphene Heated Eye Mask Cordless",cat:"health"},
+  {num:736,name:"YIGO MASTER Desk Phone Stand Black",cat:"office"},
+  {num:737,name:"Solid Wood Frame Abstract Wall Art 74x148cm",cat:"home"},
+  {num:738,name:"AUREVIA Bio-Collagen Hydrogel Mask",cat:"health"},
+  {num:739,name:"LOTUNY Cable Clips Wire Organizer 8 Pack",cat:"cables"},
+  {num:740,name:"IdyllicTime Candle Holder Set 3 Pcs",cat:"home"},
+  {num:741,name:"Stagg C542 4/4 Nylon Classical Guitar — Blue",cat:"audio"},
+  {num:742,name:"Posture Corrector for Women/Men Adjustable",cat:"health"},
+  {num:743,name:"PELONIS Standing Fan with Remote 3-Speed",cat:"home"},
+  {num:744,name:"Philips 2000i Air Purifier",cat:"home"},
+  {num:745,name:"BONECO U650 Ultrasonic Humidifier Warm/Cool",cat:"home"},
+  {num:746,name:"Acrylic Hanging Privacy Screen 32\"",cat:"office"},
+  {num:747,name:"Lenovo ThinkPad Ultra Docking Station",cat:"electronics"},
+  {num:748,name:"1500ANSI Netflix Full HD Smart Projector",cat:"electronics"},
+  {num:749,name:"Kodak Dock Plus 4x6in Portable Printer",cat:"cameras"},
+  {num:750,name:"RingConn Gen 2",cat:"health"},
+  {num:751,name:"DMoose Strength Training Wrist Exerciser",cat:"health"},
+  {num:752,name:"20\" 1600x900 75Hz Ultra Thin LED Monitor",cat:"electronics"},
+  {num:753,name:"SLQ Galaxy Z Fold 5 Slim S Pen",cat:"phone"},
+  {num:754,name:"Marvel Avengers Endgame Team Suit Iron Man Figure",cat:"home"},
+  {num:755,name:"KOHOME 6 Pcs 5\" High Rise Bed Frame Risers",cat:"home"},
+  {num:756,name:"Deep Melting Mud Pore Cleansing Oil 200ml",cat:"health"},
+  {num:757,name:"HLAVIN Lavilin Roll-on Foot Deodorant",cat:"health"},
+  {num:758,name:"Halloween Scary Ghost Face Mask",cat:"home"},
+  {num:759,name:"TEEBIM Christmas Tree Beer Ornament x5",cat:"home"},
+  {num:760,name:"ARENTI Baby Monitor 2 Cameras",cat:"electronics"},
+  {num:761,name:"Black and White Light Year Secret Series Sticker",cat:"office"},
+  {num:762,name:"Blood Pressure Monitor for Home Use",cat:"health"},
+  {num:763,name:"Comfier Shiatsu Back Massager",cat:"health"},
+  {num:764,name:"KODAK 4PASS Film Cartridge 3x3",cat:"cameras"},
+  {num:765,name:"POSEIDON Cordless Tattoo Machine Kit",cat:"health"},
+  {num:766,name:"UUQ C4-12X50 Rifle Scope Dual Illuminated",cat:"home"},
+  {num:767,name:"Robot Vacuum and Mop Combo",cat:"home"},
+  {num:768,name:"Ledger Nano X",cat:"electronics"},
+  {num:769,name:"KODAK Mini 3 ERA 4PASS Photo Printer",cat:"cameras"},
+  {num:770,name:"KODAK Dock ERA 4PASS Instant Photo Printer",cat:"cameras"},
+  {num:771,name:"Status Audio Between Pro Headphones",cat:"audio"},
+  {num:772,name:"Squad Hero Rechargeable Laser Tag 360°",cat:"home"},
+  {num:773,name:"TourBox Lite Editing Keyboard Compact",cat:"electronics"},
+  {num:774,name:"Anki OVERDRIVE Fast & Furious Edition",cat:"gaming"},
+  {num:775,name:"Govee RGBIC Smart Corner Floor Lamp",cat:"lighting"},
+  {num:776,name:"MEEDEN Beginners Acrylic Paint Set 48 Colors",cat:"home"},
+  {num:777,name:"Minimalist Wallet for Men",cat:"home"},
+  {num:778,name:"Motorola Moto Watch 100 Smart Watch 42mm",cat:"electronics"},
+  {num:779,name:"Portable Apple CarPlay Screen for Car",cat:"electronics"},
+  {num:780,name:"Phomemo M110 Label Maker",cat:"office"},
+  {num:781,name:"Phomemo Label Makers for Small Business",cat:"office"},
+  {num:782,name:"RONXS Cigar Lighter and Cigar Cutter Set",cat:"home"},
+  {num:783,name:"Surge Multi-Function Charging Hub",cat:"phone"},
+  {num:784,name:"Status Between 3ANC Headphones",cat:"audio"},
+  {num:785,name:"THIRDREALITY Smart Light Switch Gen3",cat:"electronics"},
+  {num:786,name:"Ultra Thick 120lb Cover Artist 4\"x9\" Cards",cat:"office"},
+  {num:787,name:"adonit Neo Lite Stylus",cat:"phone"},
+  {num:788,name:"iClever Foldable Bluetooth Keyboard",cat:"electronics"},
+  {num:789,name:"ieGeek 2K Indoor Security Camera",cat:"electronics"},
+  {num:790,name:"SEALED BONTEC Ergonomic Desk Extender Tray",cat:"office",status:"sealed"},
+  {num:791,name:"SEALED BONTEC Ergonomics Desk Extender Tray",cat:"office",status:"sealed"},
+  {num:792,name:"SEALED BONTEC Ergonomics Desk Extender Tray",cat:"office",status:"sealed"},
+  {num:793,name:"Knock Sensors Wiring Harness Kit",cat:"home"},
+  {num:794,name:"DEKOPRO Home Repair Tool Kit",cat:"home"},
+  {num:795,name:"HAPPRUN Native 1080P Bluetooth Projector",cat:"electronics"},
+  {num:796,name:"USB-C Dock with 4K HDMI and 60W Charging",cat:"cables"},
+  {num:797,name:"SEALED BACKBONE One Mobile Gaming Controller",cat:"gaming",status:"sealed"},
+  {num:798,name:"AKASO Brave 7 4K30FPS Waterproof Camera",cat:"cameras"},
+  {num:799,name:"Displaylink Docking Station",cat:"electronics"},
+  {num:800,name:"420-800mm f/8.3 Manual Telephoto Zoom Lens",cat:"cameras"},
+  {num:801,name:"Keys",cat:"misc"},
+  {num:802,name:"Digital Microscope",cat:"electronics"},
+  {num:803,name:"Plugable Thunderbolt Dock",cat:"cables"},
+  {num:804,name:"GameSir X2s Gaming Controller",cat:"gaming"},
+  {num:805,name:"Aurzen Roku TV Smart Projector White",cat:"electronics"},
+  {num:806,name:"Hookah Set with Everything Included",cat:"home"},
+  {num:807,name:"Nattork Kids Roller Skates Size 1Y-4Y",cat:"home"},
+  {num:808,name:"SE Pet Camera Home Security Camera",cat:"electronics"},
+  {num:809,name:"StarTech.com Triple Monitor Docking Station",cat:"electronics"},
+  {num:810,name:"EZVALO CSD01 Alarm Clock Speaker Dock",cat:"electronics"},
+  {num:811,name:"COMFIER Shiatsu Foot Massager with Heat",cat:"health"},
+  {num:812,name:"KODAK Dock Plus Retro 4x6 Inch Printer",cat:"cameras"},
+  {num:813,name:"80W LED Logo GOBO Projector",cat:"lighting"},
+  {num:814,name:"Queenoris Shoulder Tote Bag for Women",cat:"home"},
+  {num:815,name:"Hookah Set with Everything Included",cat:"home"},
+  {num:816,name:"Custom Molded Percussive Filters",cat:"audio"},
+  {num:817,name:"PYS Magnetic Privacy Screen for MacBook",cat:"electronics"},
+  {num:818,name:"RingConn Gen 2",cat:"health"},
+  {num:819,name:"KODAK Dock Plus Printer",cat:"cameras"},
+  {num:820,name:"Foot Massager",cat:"health"},
+  {num:821,name:"Brydge Stone CORE Docking Station",cat:"electronics"},
+  {num:822,name:"Bopomofo Stylus Pen",cat:"phone"},
+  {num:823,name:"UGREEN Laptop Stand",cat:"office"},
+  {num:824,name:"DESTEK V5 VR Headset",cat:"gaming"},
+  {num:825,name:"Portable Tool Box",cat:"home"},
+  {num:826,name:"SUNMON Insulin Cooler",cat:"health"},
+  {num:827,name:"Wireless HDMI Dongle",cat:"cables"},
+  {num:828,name:"Firehawk LED Light Bar",cat:"lighting"},
+  {num:829,name:"TrendArti Felt Board",cat:"home"},
+  {num:830,name:"MAIWO USB C Enclosure",cat:"cables"}
+];
+
+// Compute stats
+let sealed=0,newItems=0,asis=0;
+items.forEach(i => {
+  if(i.status==='sealed') sealed++;
+  else if(i.status==='new') newItems++;
+  else if(i.status==='as-is') asis++;
+});
+document.getElementById('sealedCount').textContent = sealed;
+document.getElementById('newCount').textContent = newItems;
+document.getElementById('asisCount').textContent = asis;
+
+let activeCategory = 'all';
+let currentItems = [...items];
+let selectedItem = null;
+
+function getBadge(status, name) {
+  const n = name.toLowerCase();
+  if (status === 'sealed') return {cls:'badge-sealed', label:'SEALED'};
+  if (status === 'new') return {cls:'badge-new', label:'NEW'};
+  if (status === 'as-is') return {cls:'badge-as-is', label:'AS-IS'};
+  if (status === 'used') return {cls:'badge-used', label:'USED'};
+  if (n.includes('misc') || n.includes('mystery') || n.includes('assorted')) return {cls:'badge-misc', label:'MISC'};
+  return null;
+}
+
+function renderGrid(data) {
+  const grid = document.getElementById('itemGrid');
+  if (data.length === 0) {
+    grid.innerHTML = '<div class="no-results"><span class="big">404</span>No items found — try a different search.</div>';
+    return;
+  }
+  grid.innerHTML = data.map((item, idx) => {
+    const badge = getBadge(item.status, item.name);
+    const delay = Math.min(idx * 18, 400);
+    return `<div class="item-card" style="animation-delay:${delay}ms" onclick="openModal(${item.num})">
+      <div class="item-num">#${String(item.num).padStart(3,'0')}</div>
+      <div class="item-name">${item.name}</div>
+      ${badge ? `<span class="item-badge ${badge.cls}">${badge.label}</span>` : ''}
+      <button class="contact-btn" onclick="event.stopPropagation();openModal(${item.num})">Inquire →</button>
+    </div>`;
+  }).join('');
+
+  const count = data.length;
+  document.getElementById('countSpan').textContent = count;
+  document.getElementById('visibleCount').textContent = count;
+  document.getElementById('resultStat').textContent = count;
+  document.getElementById('resultsInfo').innerHTML = `Showing <span>${count}</span> of ${items.length} items`;
+}
+
+function filterAndSort() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+
+  let filtered = items.filter(item => {
+    const catMatch = activeCategory === 'all' || item.cat === activeCategory;
+    const searchMatch = !query || item.name.toLowerCase().includes(query) || String(item.num).includes(query);
+    return catMatch && searchMatch;
+  });
+
+  if (sort === 'num-asc') filtered.sort((a,b) => a.num - b.num);
+  else if (sort === 'num-desc') filtered.sort((a,b) => b.num - a.num);
+  else if (sort === 'alpha') filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+  renderGrid(filtered);
+}
+
+// Events
+document.getElementById('searchInput').addEventListener('input', filterAndSort);
+document.getElementById('sortSelect').addEventListener('change', filterAndSort);
+
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCategory = btn.dataset.cat;
+    filterAndSort();
+  });
+});
+
+// Modal
+function openModal(num) {
+  const item = items.find(i => i.num === num);
+  if (!item) return;
+  selectedItem = item;
+  document.getElementById('modalNum').textContent = '#' + String(num).padStart(3,'0');
+  document.getElementById('modalName').textContent = item.name;
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('open');
+}
+
+function copyItem() {
+  if (!selectedItem) return;
+  const text = `Interested in Item #${String(selectedItem.num).padStart(3,'0')}: ${selectedItem.name}`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.btn-primary');
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = 'Copy Item Info', 1800);
+  }).catch(() => alert('Item: ' + text));
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalBg').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeModal(); });
+
+// Initial render
+renderGrid(items);
+</script>
+</body>
+</html>
